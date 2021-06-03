@@ -3,11 +3,11 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
   email: { type: String, required: true },
-  profileImg: String,
+  username: { type: String, required: true },
   password: { type: String, required: true },
-  lastName: String,
-  firstName: String,
-  phoneNumber: String,
+  lastName: { type: String, required: true },
+  firstName: { type: String, required: true },
+  favorites: [{ type: Schema.Types.ObjectId, ref: "Offer" }],
 });
 
 const User = mongoose.model("User", userSchema);
