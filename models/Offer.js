@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const offerSchema = newSchema({
+const offerSchema = new Schema(
+    {
     title: String,
     id_sneaker: String,
     status: {
@@ -15,12 +16,18 @@ const offerSchema = newSchema({
     },
     size: {
         type: String,
-        enum: ["35", "36", "36.5", "37.5", "38"]
+        enum: ["35", "36", "36.5", "37.5", "38", "42"]
     },
     lookingFor: [String],
     picture: [String],
     price: String,
-});
+    creator: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
+    { timestamps: true }
+    );
 
 const Offer = mongoose.model("Offer", offerSchema);
 
