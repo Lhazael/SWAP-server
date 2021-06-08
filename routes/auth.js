@@ -10,7 +10,7 @@ router.post("/signin", (req, res, next) => {
   User.findOne({ email })
     .then((userDocument) => {
       if (!userDocument) {
-        return res.status(400).json({ message: "Invalid credentials" });
+        return res.status(400).json({ message: "Invalid email" });
       }
 
       const isValidPassword = bcrypt.compareSync(
@@ -18,13 +18,14 @@ router.post("/signin", (req, res, next) => {
         userDocument.password
       );
       if (!isValidPassword) {
-        return res.status(400).json({ message: "Invalid credentials" });
+        return res.status(400).json({ message: "Invalid password" });
       }
 
       req.session.currentUser = {
-        role: "admin",
+        // role: "admin",
         id: userDocument._id,
       };
+      console.log(userDocument.id);
 
       res.redirect("/api/auth/isLoggedIn");
     })

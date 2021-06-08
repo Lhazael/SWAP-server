@@ -24,7 +24,7 @@ router.patch("/:id_username", (req, res) => {
 
 // GET USER INFOS
 
-router.get('/:id_username', (req, res) => {
+router.get("/:id_username", (req, res) => {
     User.findById(req.session.currentUser)
       .then((documentUser) => {
         res.status(200).json(documentUser);
