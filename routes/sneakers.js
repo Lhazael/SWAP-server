@@ -1,8 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const Sneaker = require("../models/Sneaker");
+const axios = require("axios");
 
 // GET SNEAKERS
+
+router.get("/home", (req, res, next) => {
+  axios
+    .get("http://localhost:5000/home")
+    .then((response) => {
+      res.status(200).json(response.data);
+    })
+    .catch(next);
+});
+
+
 
 router.get("/", (req, res) => {
   Sneaker.find()

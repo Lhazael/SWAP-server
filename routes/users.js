@@ -5,9 +5,6 @@ const Offer = require('../models/Offer');
 
 // Prefixe : api/users
 
-router.get("/", function (req, res, next) {
-    res.send('respond with a resource');
-});
 
 // UPDATE CURRENT USER
 
@@ -24,7 +21,7 @@ router.patch("/:id_username", (req, res) => {
 
 // GET USER INFOS
 
-router.get("/:id_username", (req, res) => {
+router.get("/", (req, res) => {
     User.findById(req.session.currentUser)
       .then((documentUser) => {
         res.status(200).json(documentUser);
@@ -37,7 +34,7 @@ router.get("/:id_username", (req, res) => {
 
 // GET USER's OFFERS
 
-router.get('/:id_username/offers', (req, res, next) => {
+router.get('/offers', (req, res, next) => {
 
     Offer.find({creator: req.session.currentUser}).then((infos) => {
       res.status(200).json(infos);
