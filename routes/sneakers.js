@@ -5,6 +5,45 @@ const axios = require("axios");
 
 // GET SNEAKERS
 
+// router.get("/", (req, res) => {
+//   Sneaker.find()
+//     .then((documentSneakers) => {
+//       res.status(200).json(documentSneakers);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//       res.status(500).json({ message: "Cannot find any sneakers" });
+//     });
+// });
+
+// GET ONE SNEAKERS IN THE DB/API
+
+// router.get("/:id", (req, res) => {
+//   Sneaker.findById(req.params.id)
+//     .then((documentSneaker) => {
+//       res.status(200).json(documentSneaker);
+//     })
+//     .catch((err) => {
+//       res.status(500).json({ message: "Cannot find any sneaker" });
+//     });
+// });
+
+// ROUTES FROM API
+
+// GRAB ONE SNEAKER BY ID
+
+router.get("/id/:id", (req, res, next) => {
+  axios
+   .get("http://localhost:5000/id/:styleID")
+   .then((response) => {
+    res.status(200).json(response.data);
+  })
+  .catch(next);
+  console.log("Cannot find any sneakers");
+});
+
+// MOST POPULAR
+
 router.get("/home", (req, res, next) => {
   axios
     .get("http://localhost:5000/home")
@@ -12,31 +51,32 @@ router.get("/home", (req, res, next) => {
       res.status(200).json(response.data);
     })
     .catch(next);
+    console.log("Cannot find any sneakers");
 });
 
+// GRAB SNEAKERS FROM KEYWORDS
 
-
-router.get("/", (req, res) => {
-  Sneaker.find()
-    .then((documentSneakers) => {
-      res.status(200).json(documentSneakers);
+router.get("/search/:keyword", (req, res, next) => {
+  axios
+    .get("http://localhost:5000/search/:keyword")
+    .then((response) => {
+      res.status(200).json(response.data);
     })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ message: "Cannot find any sneakers" });
-    });
+    .catch(next);
+    console.log("Cannot find any sneakers");
 });
 
-// GET ONE SNEAKERS IN THE DB/API
+// TO HAVE PRICES BY STYLE ID
 
-router.get("/:id", (req, res) => {
-  Sneaker.findById(req.params.id)
-    .then((documentSneaker) => {
-      res.status(200).json(documentSneaker);
+router.get("/id/:styleID/prices", (req, res, next) => {
+  axios
+    .get("http://localhost:5000/id/:styleID/prices")
+    .then((response) => {
+      res.status(200).json(response.data);
     })
-    .catch((err) => {
-      res.status(500).json({ message: "Cannot find any sneaker" });
-    });
+    .catch(next);
+    console.log("Cannot find any sneakers");
 });
+
 
 module.exports = router;
