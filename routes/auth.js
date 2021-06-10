@@ -47,7 +47,10 @@ router.post("/signup", (req, res, next) => {
       User.create(newUser)
         .then((newUserDocument) => {
           /* Login on signup */
-          req.session.currentUser = newUserDocument._id;
+          req.session.currentUser = {
+            
+              id: newUserDocument._id
+          }
           res.redirect("/api/auth/isLoggedIn");
         })
         .catch(next);
@@ -59,7 +62,7 @@ router.get("/isLoggedIn", (req, res, next) => {
   if (!req.session.currentUser)
     return res.status(401).json({ message: "Unauthorized" });
 
-  const id = req.session.currentUser;
+  const id = req.session.currentUser.id;
 
   User.findById(id)
     .select("-password")

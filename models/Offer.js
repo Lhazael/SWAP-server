@@ -4,15 +4,14 @@ const Schema = mongoose.Schema;
 const offerSchema = new Schema(
     {
     title: String,
-    id_sneaker: String,
-    status: {
-        type: String,
-        enum: ["Published", "Awaiting", "Validated"]
-    },
+    styleID: {
+        type: Schema.Types.ObjectId,
+        ref: "Sneaker",
+      },
     description: String,
     condition: {
         type: String,
-        enum: ["New with tags", "New without tags", "Very good", "Good", "Very used"]
+        enum: ["new-with-tags", "new-without-tags", "very-good", "good", "very-used"]
     },
     size: {
         type: String,

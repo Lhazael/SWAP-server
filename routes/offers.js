@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Offer = require("../models/Offer");
-
+const cloudinaryUploader = require("../config/cloudinary")
 // api/offers
 // GET ALL OFFERS IN THE DB
 
@@ -30,18 +30,23 @@ router.get("/:id", (req, res) => {
 
 // CREATE AN OFFER IN THE DB
 
-router.post("/", (req, res) => {
-  const { title, description, condition, size, lookingFor, picture, price } =
+router.post("/", cloudinaryUploader.single("image"), (req, res) => {
+
+ 
+
+  const { title, styleID, description, condition, size, lookingFor, picture, price, creator } =
     req.body;
 
   const newOffer = {
     title,
+    styleID,
     description,
     condition,
     size,
     lookingFor,
     picture,
     price,
+    creator,
   };
 
   Offer.create(newOffer)
@@ -49,6 +54,7 @@ router.post("/", (req, res) => {
       res.status(200).json(documentOffer);
     })
     .catch((err) => {
+      console.log(err)
       res.status(500).json({ message: "Cannot create offer" });
     });
 });

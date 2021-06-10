@@ -33,8 +33,9 @@ const axios = require("axios");
 // GRAB ONE SNEAKER BY ID
 
 router.get("/id/:id", (req, res, next) => {
+  console.log(req.params.id);
   axios
-   .get("http://localhost:5000/id/:styleID")
+   .get("http://localhost:5000/id/" + req.params.id)
    .then((response) => {
     res.status(200).json(response.data);
   })
@@ -57,8 +58,9 @@ router.get("/home", (req, res, next) => {
 // GRAB SNEAKERS FROM KEYWORDS
 
 router.get("/search/:keyword", (req, res, next) => {
+  console.log(req.params.keyword)
   axios
-    .get("http://localhost:5000/search/:keyword")
+    .get("http://localhost:5000/search/" + req.params.keyword)
     .then((response) => {
       res.status(200).json(response.data);
     })
