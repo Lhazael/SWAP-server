@@ -15,6 +15,21 @@ const app = express();
  */
 const corsOptions = { origin: process.env.FRONTEND_URL, credentials: true };
 
+
+mongoose
+  .connect(
+    process.env.MONGODB_URI,            //  <--- UPDATE
+    {
+        useCreateIndex: true,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+    }
+	)
+  .then((x) => console.log('Connected to the DB')
+  .catch(err => console.error('Error while connecting to DB', err)));
+ 
+
 app.use(cors(corsOptions));
 app.use(logger("dev")); // This logs HTTP reponses in the console.
 app.use(express.json()); // Access data sent as json @req.body
