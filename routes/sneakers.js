@@ -35,7 +35,7 @@ const axios = require("axios");
 router.get("/id/:id", (req, res, next) => {
   console.log(req.params.id);
   axios
-   .get("http://localhost:5000/id/" + req.params.id)
+   .get(process.env.SNEAKSERVER_URL + "/id/" + req.params.id)
    .then((response) => {
     res.status(200).json(response.data);
   })
@@ -47,7 +47,7 @@ router.get("/id/:id", (req, res, next) => {
 
 router.get("/home", (req, res, next) => {
   axios
-    .get("http://localhost:5000/home")
+    .get(process.env.SNEAKSERVER_URL + "/home")
     .then((response) => {
       res.status(200).json(response.data);
     })
@@ -60,7 +60,7 @@ router.get("/home", (req, res, next) => {
 router.get("/search/:keyword", (req, res, next) => {
   console.log(req.params.keyword)
   axios
-    .get("http://localhost:5000/search/" + req.params.keyword)
+    .get(process.env.SNEAKSERVER_URL + "/search/" + req.params.keyword)
     .then((response) => {
       res.status(200).json(response.data);
     })
@@ -72,7 +72,7 @@ router.get("/search/:keyword", (req, res, next) => {
 
 router.get("/id/:styleID/prices", (req, res, next) => {
   axios
-    .get("http://localhost:5000/id/:styleID/prices")
+    .get(process.env.SNEAKSERVER_URL+ `/id/${req.params.styleID}/prices`)
     .then((response) => {
       res.status(200).json(response.data);
     })
