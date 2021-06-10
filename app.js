@@ -1,11 +1,13 @@
 require("dotenv").config();
 require("./config/dbConnection");
 
+
 const express = require("express");
 const path = require("path");
 const logger = require("morgan");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
+const mongoose = require("mongoose");
 
 const cors = require("cors");
 
@@ -26,8 +28,12 @@ mongoose
         useFindAndModify: false,
     }
 	)
-  .then((x) => console.log('Connected to the DB')
-  .catch(err => console.error('Error while connecting to DB', err)));
+  .then((x) => {
+    console.log('Connected to the DB');
+  })
+  .catch((err) =>  {
+    console.error('Error while connecting to DB', err);
+  });
  
 
 app.use(cors(corsOptions));

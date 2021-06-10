@@ -31,56 +31,44 @@ router.get("/:id", (req, res) => {
 
 // CREATE AN OFFER IN THE DB
 
-router.post("/", cloudinaryUploader.single("picture"), (req, res, next) => {
+router.post("/", cloudinaryUploader.single("picture"), (req, res) => {
 
- const newOffer = { ...req.body };
+  const { title, styleID, description, condition, size, lookingFor, picture, price } =
+    req.body;
 
- if (req.file) {
-  newOffer.picture = req.file.path;
-}
+console.log(req.body);
 
-newOffer.creator = req.session.currentUser;
-
-  // const { title, styleID, description, condition, size, lookingFor, picture, price } =
-  //   req.body;
-
-// console.log(req.body);
-
-  // const newOffer = {
-  //   title,
-  //   styleID,
-  //   description,
-  //   condition,
-  //   size,
-  //   lookingFor,
-  //   picture,
-  //   price,
-  //   creator,  
-  // };
+  const newOffer = {
+    title,
+    styleID,
+    description,
+    condition,
+    size,
+    lookingFor,
+    picture,
+    price,
+    creator: req.session.currentUser,  
+  };
 
   // req.session.currentUser = newOffer.creator;
 
   Offer.create(newOffer)
     .then((documentOffer) => {
-      documentOffer
-      .populate("creator")
-      .execPopulate()
-      .then((offer) => {
-        console.log("Yoooooooo finally!!!");
-        res.status(200).json(offer);
-      })
-      .catch(next);
-    //   res.status(200).json(documentOffer);
-    // })
-    // .catch((err) => {
-    //   console.log(err)
-      // res.status(500).json({ message: "Cannot create offer" });
+
+      req.session.currentUser = {
+        id: documentOffer._id
+      }
+      res.status(200).json(documentOffer);
     })
-    .catch(next);
-    // .catch((err) => {
-    // console.log(err)
-    // res.status(500).json({ message: "Cannot create offer bis" });
+    .catch((err) => {
+      console.log(err)
+      res.status(500).json({ message: "Cannot create offer" });
+    })
+    .catch((err) => {
+    console.log(err)
+    res.status(500).json({ message: "Cannot create offer" });
 });
+})
 
 
 // UPDATE AN OFFER
@@ -108,5 +96,6 @@ router.delete("/:id", (req, res) => {
       res.status(500).json({ message: "Cannot delete offer" })
     });
 });
+
 
 module.exports = router;
