@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Offer = require("../models/Offer");
-const cloudinaryUploader = require("../config/cloudinary")
+const cloudinaryUploader = require("../config/cloudinary");
+const { SchemaTypeOptions } = require("mongoose");
 // api/offers
 // GET ALL OFFERS IN THE DB
 
@@ -30,34 +31,57 @@ router.get("/:id", (req, res) => {
 
 // CREATE AN OFFER IN THE DB
 
-router.post("/", cloudinaryUploader.single("image"), (req, res) => {
+router.post("/", cloudinaryUploader.single("picture"), (req, res, next) => {
 
- 
+ const newOffer = { ...req.body };
 
-  const { title, styleID, description, condition, size, lookingFor, picture, price, creator } =
-    req.body;
+ if (req.file) {
+  newOffer.picture = req.file.path;
+}
 
-  const newOffer = {
-    title,
-    styleID,
-    description,
-    condition,
-    size,
-    lookingFor,
-    picture,
-    price,
-    creator,
-  };
+newOffer.creator = req.session.currentUser;
+
+  // const { title, styleID, description, condition, size, lookingFor, picture, price } =
+  //   req.body;
+
+// console.log(req.body);
+
+  // const newOffer = {
+  //   title,
+  //   styleID,
+  //   description,
+  //   condition,
+  //   size,
+  //   lookingFor,
+  //   picture,
+  //   price,
+  //   creator,  
+  // };
+
+  // req.session.currentUser = newOffer.creator;
 
   Offer.create(newOffer)
     .then((documentOffer) => {
-      res.status(200).json(documentOffer);
+      documentOffer
+      .populate("creator")
+      .execPopulate()
+      .then((offer) => {
+        console.log("Yoooooooo finally!!!");
+        res.status(200).json(offer);
+      })
+      .catch(next);
+    //   res.status(200).json(documentOffer);
+    // })
+    // .catch((err) => {
+    //   console.log(err)
+      // res.status(500).json({ message: "Cannot create offer" });
     })
-    .catch((err) => {
-      console.log(err)
-      res.status(500).json({ message: "Cannot create offer" });
-    });
+    .catch(next);
+    // .catch((err) => {
+    // console.log(err)
+    // res.status(500).json({ message: "Cannot create offer bis" });
 });
+
 
 // UPDATE AN OFFER
 

@@ -4,10 +4,7 @@ const Schema = mongoose.Schema;
 const offerSchema = new Schema(
     {
     title: String,
-    styleID: {
-        type: Schema.Types.ObjectId,
-        ref: "Sneaker",
-      },
+    styleID: String,
     description: String,
     condition: {
         type: String,
