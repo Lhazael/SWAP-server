@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Offer = require("../models/Offer");
+const User = require("../models/User");
 const cloudinaryUploader = require("../config/cloudinary");
 
 // api/offers
@@ -72,10 +73,10 @@ router.patch("/:id", cloudinaryUploader.array("picture", 5), (req, res, next) =>
 const offer = { ...req.body };
 
 Offer.findById(req.params.id)
-.then((offerdocument) => {
+.then((offerDocument) => {
   if (!offerDocument)
   return res.status(404).json({message: "Offer not found"});
-  if (offerdocument.creator.toString() !== req.session.currentUser) {
+  if (offerDocument.creator.toString() !== req.session.currentUser) {
     return res.status(403).json({ message: "You are not allowed to update this offer!" });
   }
 
