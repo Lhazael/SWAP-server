@@ -8,8 +8,8 @@ const Offer = require('../models/Offer');
 
 // UPDATE CURRENT USER
 
-router.patch("/:id_username", (req, res) => {
-    User.findByIdAndUpdate(req.session.currentUser, req.body, { new: true })
+router.patch("/:id", (req, res) => {
+    User.findByIdAndUpdate(req.session.currentUser._id, req.body, { new: true })
       .then((documentUser) => {
         res.status(200).json(documentUser);
       })
@@ -22,7 +22,7 @@ router.patch("/:id_username", (req, res) => {
 // GET USER INFOS
 
 router.get("/", (req, res) => {
-    User.findById(req.session.currentUser)
+    User.findById(req.session.currentUser._id)
       .then((documentUser) => {
         res.status(200).json(documentUser);
       })
@@ -36,7 +36,7 @@ router.get("/", (req, res) => {
 
 router.get('/offers', (req, res, next) => {
 
-    Offer.find({creator: req.session.currentUser}).then((infos) => {
+    Offer.find({creator: req.session.currentUser._id}).then((infos) => {
       res.status(200).json(infos);
     }).catch((err) => {
      next(err)

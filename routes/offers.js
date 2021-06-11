@@ -42,7 +42,7 @@ router.post("/", cloudinaryUploader.array("picture", 5), (req, res, next) => {
   console.log(req.body.creator);
   console.log(creator);
   console.log(req.session.currentUser);
-  updateValues.creator = req.session.currentUser;
+  updateValues.creator = req.session.currentUser._id;
 
  // get the offer's creator's id
 
