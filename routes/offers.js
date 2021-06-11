@@ -2,99 +2,122 @@ const express = require("express");
 const router = express.Router();
 const Offer = require("../models/Offer");
 const cloudinaryUploader = require("../config/cloudinary");
-const { SchemaTypeOptions } = require("mongoose");
+
 // api/offers
 // GET ALL OFFERS IN THE DB
 
-router.get("/", (req, res) => {
-  Offer.find()
+router.get("/", (req, res, next) => {
+  Offer.find({})
+    .populate("creator")  // Gives the author's id creator object document 
     .then((documentOffers) => {
       res.status(200).json(documentOffers);
     })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ message: "Cannot find any offer" });
-    });
+    .catch(next);
 });
 
 // GET ONE OFFER IN THE DB
 
-router.get("/:id", (req, res) => {
+router.get("/:id", (req, res, next) => {
   Offer.findById(req.params.id) // (req.body) => input  // (req.params.id) => url
+    .populate("creator")
     .then((documentOffer) => {
       res.status(200).json(documentOffer);
     })
-    .catch((err) => {
-      res.status(500).json({ message: "Cannot find any offer" });
-    });
+    .catch(next);
 });
 
 // CREATE AN OFFER IN THE DB
 
-router.post("/", cloudinaryUploader.single("picture"), (req, res) => {
+router.post("/", cloudinaryUploader.array("picture", 5), (req, res, next) => {
+  const updateValues = { ...req.body };
+  console.log(req.body);
 
-  const { title, styleID, description, condition, size, lookingFor, picture, price } =
-    req.body;
+  let picturesArray = []; // create empty array for the pictures
 
-console.log(req.body);
+  if (req.files) {
+    req.files.forEach(element => picturesArray.push(element.path)); // Push image urls into empty array
+    updateValues.picture = picturesArray
+  }
 
-  const newOffer = {
-    title,
-    styleID,
-    description,
-    condition,
-    size,
-    lookingFor,
-    picture,
-    price,
-    creator: req.session.currentUser,  
-  };
+  updateValues.creator = req.session.currentUser; // get the offer's creator's id
 
-  // req.session.currentUser = newOffer.creator;
-
-  Offer.create(newOffer)
-    .then((documentOffer) => {
-
-      req.session.currentUser = {
-        id: documentOffer._id
-      }
-      res.status(200).json(documentOffer);
+  Offer.create(updateValues)
+  .then((offerDocument) => {
+    offerDocument
+    .populate("creator")
+    .execPopulate()
+    .then((offer) => {
+      
+      console.log("finally!!");
+      console.log(typeof(creator));
+      res.status(200).json(offer); // send the populated document
     })
-    .catch((err) => {
-      console.log(err)
-      res.status(500).json({ message: "Cannot create offer" });
+
+    .then(() => {
+      User.findByIdAndUpdate(req.session.currentUser, { $push: {offersCreated: offerDocument.id}})
+      .then(() => {
+        return res.sendStatus(203);
+      })
+      .catch(next);
     })
-    .catch((err) => {
-    console.log(err)
-    res.status(500).json({ message: "Cannot create offer" });
+    .catch(next);
+  })
+.catch(next);
 });
-})
 
 
 // UPDATE AN OFFER
 
-router.patch("/:id", (req, res) => {
-  Offer.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    .then((documentOffer) => {
-      res.status(200).json(documentOffer);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ message: "Cannot update offer" });
-    });
+router.patch("/:id", cloudinaryUploader.array("picture", 5), (req, res, next) => {
+const offer = { ...req.body };
+
+Offer.findById(req.params.id)
+.then((offerdocument) => {
+  if (!offerDocument)
+  return res.status(404).json({message: "Offer not found"});
+  if (offerdocument.creator.toString() !== req.session.currentUser) {
+    return res.status(403).json({ message: "You are not allowed to update this offer!" });
+  }
+
+  let picturesArray = []; 
+
+  if (req.files) {
+    req.files.forEach(element => picturesArray.push(element.path));
+    offer.picture = [...offerDocument.picture, ...picturesArray];
+  }
+
+  Offer.findByIdAndUpdate(req.params.id, offer, { new: true})
+  .populate("creator")
+  .then((updatedOffer) => {
+    return res.status(200).json(updatedOffer);
+  })
+  .catch(next);
+  })
+  .catch(next);
 });
 
 // DELETE AN OFFER
 
-router.delete("/:id", (req, res) => {
-  Offer.findByIdAndRemove(req.params.id)
-    .then((documentOffer) => {
-      res.status(200).json(documentOffer, { message: "Deleted" })
+router.delete("/:id", (req, res, next) => {
+  Offer.findById(req.params.id)
+  .then((offerDocument) => {
+    if (!offerDocument) {
+      return res.status(404).json({ message: "Offer not found" });
+    }
+    if (offerDocument.creator.toString() !== req.session.currentUser) {
+      return res.status(403).json({ message: "You are not allowed to delete this offer" });
+    }
+    Offer.findByIdAndRemove(req.params.id)
+    .then((offerDocument) => {
+      User.findByIdAndUpdate(req.session.currentUser,  { $pull: {offersCreated: req.params.id } } )
+      .then(() => {
+        return res.sendStatus(204);
+      })
+      .catch(next);
     })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ message: "Cannot delete offer" })
-    });
+    .catch(next);
+})
+.catch(next);
 });
 
 

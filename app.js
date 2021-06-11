@@ -42,7 +42,7 @@ app.use(express.json()); // Access data sent as json @req.body
 app.use(express.urlencoded({ extended: false })); // Access data sent as application/x-www-form-urlencoded @req.body
 
 app.use(express.static(path.join(__dirname, "public/build")));
-console.log("J'aime les frites");
+console.log("Hello!");
 
 app.use(
   session({
