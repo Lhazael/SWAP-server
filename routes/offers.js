@@ -30,8 +30,8 @@ router.get("/:id", (req, res, next) => {
 // CREATE AN OFFER IN THE DB
 
 router.post("/", cloudinaryUploader.array("picture", 5), (req, res, next) => {
+  const { title, styleID, description, condition, size, lookingFor, picture, price, creator } = req.body;
   const updateValues = { ...req.body };
-  console.log(req.body);
 
   let picturesArray = []; // create empty array for the pictures
 
@@ -39,8 +39,12 @@ router.post("/", cloudinaryUploader.array("picture", 5), (req, res, next) => {
     req.files.forEach(element => picturesArray.push(element.path)); // Push image urls into empty array
     updateValues.picture = picturesArray
   }
+  console.log(req.body.creator);
+  console.log(creator);
+  console.log(req.session.currentUser);
+  updateValues.creator = req.session.currentUser;
 
-  updateValues.creator = req.session.currentUser; // get the offer's creator's id
+ // get the offer's creator's id
 
   Offer.create(updateValues)
   .then((offerDocument) => {
@@ -50,16 +54,7 @@ router.post("/", cloudinaryUploader.array("picture", 5), (req, res, next) => {
     .then((offer) => {
       
       console.log("finally!!");
-      console.log(typeof(creator));
       res.status(200).json(offer); // send the populated document
-    })
-
-    .then(() => {
-      User.findByIdAndUpdate(req.session.currentUser, { $push: {offersCreated: offerDocument.id}})
-      .then(() => {
-        return res.sendStatus(203);
-      })
-      .catch(next);
     })
     .catch(next);
   })
@@ -105,16 +100,12 @@ router.delete("/:id", (req, res, next) => {
     if (!offerDocument) {
       return res.status(404).json({ message: "Offer not found" });
     }
-    if (offerDocument.creator.toString() !== req.session.currentUser) {
+    if (offerDocument.creator._id.toString() !== req.session.currentUser) {
       return res.status(403).json({ message: "You are not allowed to delete this offer" });
     }
     Offer.findByIdAndRemove(req.params.id)
-    .then((offerDocument) => {
-      User.findByIdAndUpdate(req.session.currentUser,  { $pull: {offersCreated: req.params.id } } )
       .then(() => {
         return res.sendStatus(204);
-      })
-      .catch(next);
     })
     .catch(next);
 })
